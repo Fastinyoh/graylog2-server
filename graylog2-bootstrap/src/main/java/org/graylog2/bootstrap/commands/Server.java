@@ -16,13 +16,18 @@
  */
 package org.graylog2.bootstrap.commands;
 
-import com.google.common.util.concurrent.ServiceManager;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.spi.Message;
-import com.mongodb.MongoException;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+
 import org.graylog2.Configuration;
 import org.graylog2.UI;
 import org.graylog2.bindings.AlarmCallbackBindings;
@@ -33,7 +38,6 @@ import org.graylog2.bindings.PeriodicalBindings;
 import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.RotationStrategyBindings;
 import org.graylog2.bindings.ServerBindings;
-import org.graylog2.bindings.ServerMessageInputBindings;
 import org.graylog2.bindings.ServerObjectMapperModule;
 import org.graylog2.bootstrap.Main;
 import org.graylog2.bootstrap.ServerBootstrap;
@@ -52,13 +56,11 @@ import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import com.google.common.util.concurrent.ServiceManager;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.spi.Message;
+import com.mongodb.MongoException;
 
 @Command(name = "server", description = "Start the Graylog server")
 public class Server extends ServerBootstrap implements Runnable {
@@ -100,7 +102,6 @@ public class Server extends ServerBootstrap implements Runnable {
     protected List<Module> getCommandBindings() {
         return Arrays.<Module>asList(new ServerBindings(configuration, capabilities()),
                 new PersistenceServicesBindings(),
-                new ServerMessageInputBindings(),
                 new MessageFilterBindings(),
                 new AlarmCallbackBindings(),
                 new InitializerBindings(),

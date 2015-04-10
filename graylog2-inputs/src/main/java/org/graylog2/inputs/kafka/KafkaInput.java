@@ -16,16 +16,18 @@
  */
 package org.graylog2.inputs.kafka;
 
-import com.codahale.metrics.MetricRegistry;
 import javax.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.inputs.codecs.RadioMessageCodec;
+
+import org.graylog2.inputs.codecs.RawCodec;
 import org.graylog2.inputs.transports.KafkaTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
+
+import com.codahale.metrics.MetricRegistry;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 
 public class KafkaInput extends MessageInput {
 
@@ -35,27 +37,17 @@ public class KafkaInput extends MessageInput {
     public KafkaInput(@Assisted Configuration configuration,
                       MetricRegistry metricRegistry,
                       KafkaTransport.Factory transport,
-                      RadioMessageCodec.Factory codec,
+                      RawCodec.Factory codec,
                       LocalMetricRegistry localRegistry,
                       Config config,
                       Descriptor descriptor, ServerStatus serverStatus) {
-        this(metricRegistry,
+        super(metricRegistry,
                 configuration,
                 transport.create(configuration),
-                codec.create(configuration),
                 localRegistry,
+                codec.create(configuration),
                 config,
                 descriptor, serverStatus);
-    }
-
-    protected KafkaInput(MetricRegistry metricRegistry,
-                         Configuration configuration,
-                         KafkaTransport radioKafkaTransport,
-                         RadioMessageCodec radioMessageCodec,
-                         LocalMetricRegistry localRegistry,
-                         MessageInput.Config config,
-                         MessageInput.Descriptor descriptor, ServerStatus serverStatus) {
-        super(metricRegistry, configuration, radioKafkaTransport, localRegistry, radioMessageCodec, config, descriptor, serverStatus);
     }
 
     public interface Factory extends MessageInput.Factory<KafkaInput> {
@@ -78,7 +70,7 @@ public class KafkaInput extends MessageInput {
 
     public static class Config extends MessageInput.Config {
         @Inject
-        public Config(KafkaTransport.Factory transport, RadioMessageCodec.Factory codec) {
+        public Config(KafkaTransport.Factory transport, RawCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
     }
